@@ -31,7 +31,7 @@
 
 // Apply CSS injection using html.elem
 #inject-css()
-#set text(size: 11pt, fill: theme.colors.text)
+#set text(size: 11pt)
 #set heading(numbering: "1.")
 #show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
 #show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
