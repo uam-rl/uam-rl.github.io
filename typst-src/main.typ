@@ -19,13 +19,16 @@
 // Automatic math equation handling with show rule
 #show math.equation: it => context {
   if sys.inputs.at("target", default: "pdf") == "html" {
+    // Use uncommon near-black color for HTML SVG generation
+    // #0a0a0a is visually identical to black but uncommon enough for post-processing
+    set text(fill: rgb("#0a0a0a"))
     if it.block {
       html.frame(it)           // Block: standalone SVG
     } else {
       box(html.frame(it))      // Inline: wrapped SVG
     }
   } else {
-    it                         // PDF: native math
+    it                         // PDF: native math (uses default color)
   }
 }
 
