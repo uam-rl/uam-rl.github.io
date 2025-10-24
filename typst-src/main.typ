@@ -74,4 +74,3 @@ $ J(pi) = EE_(tau tilde pi) [sum_(t=0)^infinity gamma^t r_t] $
 == Get Involved
 
 Visit our GitHub organization at https://github.com/uam-rl to explore our projects and contribute to our research.
-
