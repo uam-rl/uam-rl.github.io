@@ -1,0 +1,45 @@
+name: "Deploy PDF and HTML to GitHub Pages"
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'typst-src/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create build directory
+      run: mkdir -p build
+    - run: nix develop -c typst compile typst-src/main.typ build/main.pdf
+    - run: nix develop -c typst compile typst-src/main.typ build/main.html --input target=html --features html
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './build'
+        
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
