@@ -26,6 +26,8 @@ jobs:
       run: mkdir -p build
     - run: nix develop -c typst compile typst-src/main.typ build/main.pdf
     - run: nix develop -c typst compile typst-src/main.typ build/main.html --input target=html --features html
+    - name: Copy HTML to index
+      run: cp build/main.html build/index.html
     - name: Setup Pages
       uses: actions/configure-pages@v5
     - name: Upload artifact
