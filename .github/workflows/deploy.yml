@@ -31,6 +31,7 @@ jobs:
         mkdir -p build
         cp result-pdf build/main.pdf
         cp result-html build/main.html
+        chmod +w build/main.html
     - name: Fix SVG fills for Dark Reader compatibility
       run: python3 fix-svg-fills.py build/main.html
     - name: Copy HTML to index
