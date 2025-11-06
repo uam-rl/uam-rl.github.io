@@ -31,6 +31,9 @@
       typixLib = typix.lib.${system};
 
       src = typixLib.cleanTypstSource ./.;
+
+      # Python script for post-processing HTML
+      fixSvgScript = ./fix-svg-fills.py;
       commonArgs = {
         typstSource = "typst-src/main.typ";
 
@@ -62,20 +65,47 @@
         }
       ];
 
-      # Build PDF in sandbox
+      # Build PDF in sandbox (with html features for html.aside etc)
       build-pdf = typixLib.buildTypstProject (commonArgs
         // {
           inherit src unstable_typstPackages;
           name = "main.pdf";
+          typstCompileCommand = "typst compile --features html";
         });
 
-      # Build HTML in sandbox
+      # Build HTML in sandbox with SVG fix
       build-html = typixLib.buildTypstProject (commonArgs
         // {
           inherit src unstable_typstPackages;
           name = "main.html";
+          nativeBuildInputs = [ pkgs.python3 ];
           buildPhaseTypstCommand = ''
-            typst compile --input target=html --features html ${commonArgs.typstSource} "$out"
+            typst compile --input target=html --features html ${commonArgs.typstSource} temp.html
+            python3 ${fixSvgScript} temp.html
+            mv temp.html "$out"
+          '';
+        });
+
+      # Build introduccion PDF in sandbox (with html features for html.aside etc)
+      build-introduccion-pdf = typixLib.buildTypstProject (commonArgs
+        // {
+          inherit src unstable_typstPackages;
+          typstSource = "typst-src/introduccion.typ";
+          name = "introduccion.pdf";
+          typstCompileCommand = "typst compile --features html";
+        });
+
+      # Build introduccion HTML in sandbox with SVG fix
+      build-introduccion-html = typixLib.buildTypstProject (commonArgs
+        // {
+          inherit src unstable_typstPackages;
+          typstSource = "typst-src/introduccion.typ";
+          name = "introduccion.html";
+          nativeBuildInputs = [ pkgs.python3 ];
+          buildPhaseTypstCommand = ''
+            typst compile --input target=html --features html typst-src/introduccion.typ temp.html
+            python3 ${fixSvgScript} temp.html
+            mv temp.html "$out"
           '';
         });
 
@@ -101,6 +131,8 @@
         default = build-drv;
         pdf = build-pdf;
         html = build-html;
+        introduccion-pdf = build-introduccion-pdf;
+        introduccion-html = build-introduccion-html;
       };
 
       apps = rec {

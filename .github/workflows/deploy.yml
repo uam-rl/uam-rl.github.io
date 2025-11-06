@@ -22,19 +22,22 @@ jobs:
     - uses: cachix/install-nix-action@v31
       with:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build PDF in sandbox
-      run: nix build .#pdf -o result-pdf
-    - name: Build HTML in sandbox
-      run: nix build .#html -o result-html
+    - name: Build main PDF in sandbox
+      run: nix build .#pdf -o result-main-pdf
+    - name: Build main HTML in sandbox
+      run: nix build .#html -o result-main-html
+    - name: Build introduccion PDF in sandbox
+      run: nix build .#introduccion-pdf -o result-introduccion-pdf
+    - name: Build introduccion HTML in sandbox
+      run: nix build .#introduccion-html -o result-introduccion-html
     - name: Create build directory and copy outputs
       run: |
         mkdir -p build
-        cp result-pdf build/main.pdf
-        cp result-html build/main.html
-        chmod +w build/main.html
-    - name: Fix SVG fills for Dark Reader compatibility
-      run: python3 fix-svg-fills.py build/main.html
-    - name: Copy HTML to index
+        cp result-main-pdf build/main.pdf
+        cp result-main-html build/main.html
+        cp result-introduccion-pdf build/introduccion.pdf
+        cp result-introduccion-html build/introduccion.html
+    - name: Copy main HTML to index
       run: cp build/main.html build/index.html
     - name: Setup Pages
       uses: actions/configure-pages@v5

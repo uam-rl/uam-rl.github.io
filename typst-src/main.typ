@@ -11,7 +11,7 @@
 #let inject-css() = context {
   if sys.inputs.at("target", default: "pdf") == "html" {
     html.elem("style",
-      "h1, h2, h3 { color: #667eea; font-weight: 700; } svg { margin: 1.5em auto; display: block; border-radius: 8px; } body { max-width: 65ch; margin: 0 auto; padding: 2rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; } span svg { margin: 0; display: inline-block; vertical-align: middle; } a { color: #667eea; text-decoration: none; } a:hover { color: #764ba2; }"
+      "@import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-sans@5.0.0/400.css'); @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-sans@5.0.0/700.css'); @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-mono@5.0.0/index.css'); body { font-family: 'DejaVu Sans', 'Verdana', sans-serif; } code, pre { font-family: 'DejaVu Mono', 'DejaVu Sans Mono', 'Consolas', monospace; } h1, h2, h3 { color: #667eea; font-weight: 700; } strong, b { font-weight: 700; } svg { margin: 1.5em auto; display: block; border-radius: 8px; } body { max-width: 65ch; margin: 0 auto; padding: 2rem; margin-left: calc(250px + 2rem); } span svg { margin: 0; display: inline-block; vertical-align: middle; } a { color: #667eea; text-decoration: none; } a:hover { color: #764ba2; } aside { position: fixed; left: 0; top: 0; width: 250px; height: 100vh; border-right: 2px solid #667eea; padding: 2rem 1rem; overflow-y: auto; box-sizing: border-box; }"
     )
   }
 }
@@ -32,12 +32,22 @@
   }
 }
 
+// Import chapter configuration and sidebar
+#import "chapters.typ": sidebar
+
 // Apply CSS injection using html.elem
 #inject-css()
-#set text(size: 11pt)
+
+// Set font for both PDF and HTML
+#set text(font: "New Computer Modern", size: 11pt)
+#show raw: set text(font: "New Computer Modern Mono")
+
 #set heading(numbering: "1.")
 #show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
 #show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
+
+// Render sidebar
+#sidebar()
 
 = UAM RL
 

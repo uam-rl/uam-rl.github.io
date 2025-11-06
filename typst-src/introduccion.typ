@@ -1,4 +1,55 @@
-== Introduction to Reinforcement Learning
+// Hybrid CSS-in-Typst + External CSS approach
+#let theme = (
+  colors: (
+    primary: rgb("#667eea"),
+    secondary: rgb("#764ba2"),
+    text: rgb("#1d1d1d"),
+  )
+)
+
+// CSS injection using html.elem (cleaner approach)
+#let inject-css() = context {
+  if sys.inputs.at("target", default: "pdf") == "html" {
+    html.elem("style",
+      "@import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-sans@5.0.0/400.css'); @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-sans@5.0.0/700.css'); @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-mono@5.0.0/index.css'); body { font-family: 'DejaVu Sans', 'Verdana', sans-serif; } code, pre { font-family: 'DejaVu Mono', 'DejaVu Sans Mono', 'Consolas', monospace; } h1, h2, h3 { color: #667eea; font-weight: 700; } strong, b { font-weight: 700; } svg { margin: 1.5em auto; display: block; border-radius: 8px; } body { max-width: 65ch; margin: 0 auto; padding: 2rem; margin-left: calc(250px + 2rem); } span svg { margin: 0; display: inline-block; vertical-align: middle; } a { color: #667eea; text-decoration: none; } a:hover { color: #764ba2; } aside { position: fixed; left: 0; top: 0; width: 250px; height: 100vh; border-right: 2px solid #667eea; padding: 2rem 1rem; overflow-y: auto; box-sizing: border-box; }"
+    )
+  }
+}
+
+// Automatic math equation handling with show rule
+#show math.equation: it => context {
+  if sys.inputs.at("target", default: "pdf") == "html" {
+    // Use uncommon near-black color for HTML SVG generation
+    // #0a0a0a is visually identical to black but uncommon enough for post-processing
+    set text(fill: rgb("#0a0a0a"))
+    if it.block {
+      html.frame(it)           // Block: standalone SVG
+    } else {
+      box(html.frame(it))      // Inline: wrapped SVG
+    }
+  } else {
+    it                         // PDF: native math (uses default color)
+  }
+}
+
+// Import chapter configuration and sidebar
+#import "chapters.typ": sidebar
+
+// Apply CSS injection using html.elem
+#inject-css()
+
+// Set font for both PDF and HTML
+#set text(font: "New Computer Modern", size: 11pt)
+#show raw: set text(font: "New Computer Modern Mono")
+
+#set heading(numbering: "1.")
+#show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
+#show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
+
+// Render sidebar
+#sidebar()
+
+= Introduction to Reinforcement Learning
 El aprendizaje por refuerzo aparece en la interseccioón de muchos campos. En ciencias computacionales se estudia como parte del machine learning; en neurociencia se relaciona con los sistemas de recompensa; en psicología con el condicionamiento clásico y operante; en economía con la racionalidad limitada y la toma de decisiones secuenciales; en matemáticas con la investigación de operaciones; y en ingeniería con el control óptimo.
 
 *Nota* el M-L se podria ver como una interseccion entre aprendizaje supervisado, el no supervisado y el aprendizaje por refuerzo.
