@@ -62,12 +62,26 @@
         }
       ];
 
-      # Compile a Typst project, *without* copying the result
-      # to the current directory
-      build-drv = typixLib.buildTypstProject (commonArgs
+      # Build PDF in sandbox
+      build-pdf = typixLib.buildTypstProject (commonArgs
         // {
           inherit src unstable_typstPackages;
+          name = "main.pdf";
         });
+
+      # Build HTML in sandbox
+      build-html = typixLib.buildTypstProject (commonArgs
+        // {
+          inherit src unstable_typstPackages;
+          name = "main.html";
+          buildPhaseTypstCommand = ''
+            typst compile --input target=html --features html ${commonArgs.typstSource} "$out"
+          '';
+        });
+
+      # Compile a Typst project, *without* copying the result
+      # to the current directory
+      build-drv = build-pdf;
 
       # Compile a Typst project, and then copy the result
       # to the current directory
@@ -83,7 +97,11 @@
         inherit build-drv build-script watch-script;
       };
 
-      packages.default = build-drv;
+      packages = {
+        default = build-drv;
+        pdf = build-pdf;
+        html = build-html;
+      };
 
       apps = rec {
         default = watch;
