@@ -80,7 +80,7 @@
           name = "main.html";
           nativeBuildInputs = [ pkgs.python3 ];
           buildPhaseTypstCommand = ''
-            typst compile --input target=html --features html ${commonArgs.typstSource} temp.html
+            typst compile --features html ${commonArgs.typstSource} temp.html
             python3 ${fixSvgScript} temp.html
             mv temp.html "$out"
           '';
@@ -103,7 +103,7 @@
           name = "introduccion.html";
           nativeBuildInputs = [ pkgs.python3 ];
           buildPhaseTypstCommand = ''
-            typst compile --input target=html --features html typst-src/introduccion.typ temp.html
+            typst compile --features html typst-src/introduccion.typ temp.html
             python3 ${fixSvgScript} temp.html
             mv temp.html "$out"
           '';
