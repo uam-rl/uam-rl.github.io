@@ -126,8 +126,10 @@
       # Build both HTML files into a single directory
       build-html-dir = pkgs.runCommand "html-output" {} ''
         mkdir -p $out
-        ln -s ${build-html} $out/main.html
-        ln -s ${build-introduccion-html} $out/introduccion.html
+        # Copy the built HTML files instead of symlinking so the result
+        # directory can be moved or served without depending on /nix/store.
+        cp ${build-html} $out/main.html
+        cp ${build-introduccion-html} $out/introduccion.html
       '';
     in {
       checks = {

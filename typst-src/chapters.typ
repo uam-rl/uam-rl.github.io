@@ -96,21 +96,6 @@
         display: block;
       }
 
-      /* SVG elements inherit fill for Dark Reader compatibility */
-      svg path, svg use {
-        fill: inherit;
-      }
-
-      /* Math equations: ensure they use currentColor for dark mode */
-      .dark-reader-fix-text svg {
-        color: inherit;
-      }
-
-      /* Override the #0a090b fill from Typst with currentColor */
-      .dark-reader-fix-text svg *[fill='#0a090b'] {
-        fill: currentColor;
-      }
-
       /* Chapter navigation */
       nav.chapter-nav {
         display: flex;
