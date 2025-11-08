@@ -1,17 +1,5 @@
-// Hybrid CSS-in-Typst + External CSS approach
-#let theme = (
-  colors: (
-    primary: rgb("#667eea"),
-    secondary: rgb("#764ba2"),
-    text: rgb("#1d1d1d"),
-  )
-)
-
 // Import chapter configuration, sidebar, and centralized CSS
-#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav
-
-// Automatic math equation handling with show rule
-#show math.equation: fix-math
+#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav, theme
 
 // Apply CSS injection using html.elem
 #inject-all-css()
@@ -23,8 +11,10 @@
 #show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
 #show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
 
-// Render sidebar, no need for HTML conditional
-#sidebar
+#import "chapters.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "introduccion.typ",
+)
 
 = Introduction to Reinforcement Learning
 El aprendizaje por refuerzo aparece en la interseccioón de muchos campos. En ciencias computacionales se estudia como parte del machine learning; en neurociencia se relaciona con los sistemas de recompensa; en psicología con el condicionamiento clásico y operante; en economía con la racionalidad limitada y la toma de decisiones secuenciales; en matemáticas con la investigación de operaciones; y en ingeniería con el control óptimo.
@@ -91,5 +81,3 @@ Un *Modelo* predice que hará el entorno a continuación. Es una reresentación 
 
 - Transiciones $cal(P)$: predicen el siguiente estado, formalmente *$cal(P)^a_(s s') = PP[S_(t+1) = s' | S_t = s, A_t = a]$*. Es la probabilidad de que el próximo estado sea s' si ahora estas en s y haces a. En casos deterministas es igual a 0 o 1.
 - Recompensas $cal(R)$: predice la recompensa inmediata. Un modelo de recompensa predice cual será la recompensa inmediata que el agente recibirá después de ejecutar una acción específica. Formalmente *$cal(R)^a_t = EE [R_(t+1) | S_t = s, A_t = a]$*.
-
-#chapter-nav("introduccion.typ")

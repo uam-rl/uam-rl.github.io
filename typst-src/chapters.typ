@@ -1,3 +1,12 @@
+
+#let theme = (
+  colors: (
+    primary: rgb("#667eea"),
+    secondary: rgb("#764ba2"),
+    text: rgb("#1d1d1d"),
+  )
+)
+
 // Central chapter configuration
 #let chapters = (
   (
@@ -218,4 +227,15 @@
       }
     }
   }
+}
+
+#let cool-web-page(
+  body,
+  current-file: none,
+) = {
+  show math.equation: fix-math
+  sidebar
+  body
+
+  chapter-nav(current-file)
 }

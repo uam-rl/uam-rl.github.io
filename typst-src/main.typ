@@ -1,17 +1,6 @@
-// Hybrid CSS-in-Typst + External CSS approach
-#let theme = (
-  colors: (
-    primary: rgb("#667eea"),
-    secondary: rgb("#764ba2"),
-    text: rgb("#1d1d1d"),
-  )
-)
-
 // Import chapter configuration, sidebar, centralized CSS, and math fix
-#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav
+#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav, theme
 
-// Apply centralized math equation handling
-#show math.equation: fix-math
 
 // Apply CSS injection using html.elem
 #inject-all-css()
@@ -23,8 +12,10 @@
 #show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
 #show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
 
-// Render sidebar, no need for HTML conditional
-#sidebar
+#import "chapters.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "main.typ",
+)
 
 
 = UAM RL
@@ -62,6 +53,3 @@ $ J(pi) = EE_(tau tilde pi) [sum_(t=0)^infinity gamma^t r_t] $
 == Get Involved
 
 Visit our GitHub organization at https://github.com/uam-rl to explore our projects and contribute to our research.
-
-#chapter-nav("main.typ")
-
