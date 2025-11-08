@@ -7,33 +7,17 @@
   )
 )
 
-// Automatic math equation handling with show rule
-#show math.equation: it => context {
-  // Target is the only thing here that needs a context block, This is the
-  // modern approach, but requires compilation with the html feature enabled
-  if target() == "html" {
-    // Use uncommon near-black color for HTML SVG generation
-    // #0a0a0a is visually identical to black but uncommon enough for post-processing
-    set text(fill: rgb("#0a0a0a"))
-    if it.block {
-      html.frame(it)           // Block: standalone SVG
-    } else {
-      box(html.frame(it))      // Inline: wrapped SVG
-    }
-  } else {
-    it                         // PDF: native math (uses default color)
-  }
-}
-
 // Import chapter configuration, sidebar, and centralized CSS
-#import "chapters.typ": sidebar, inject-all-css
+#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav
+
+// Automatic math equation handling with show rule
+#show math.equation: fix-math
 
 // Apply CSS injection using html.elem
 #inject-all-css()
 
 // Set font for both PDF and HTML
 #set text(font: "New Computer Modern", size: 11pt)
-#show raw: set text(font: "New Computer Modern Mono")
 
 #set heading(numbering: "1.")
 #show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
@@ -94,7 +78,9 @@ De manera similar existe la política estocástica, esta define una distribució
 
 La función de valor es una predicción de la recompensa futura, que un agente puede recibir al estar en un estado particular. Su funcion es evaluar la calidad de los estados, lo que a su vez ayuda al agente a seleccionar mejor las acciones. Formalmente:
 
- *$V_pi (s) = EE_pi [R_(t+1) + γ R_(t+2) + γ^2 R_(t+3) + ... | S_t = s]$*
+$
+  V_pi (s) = EE_pi [R_(t+1) + γ R_(t+2) + γ^2 R_(t+3) + ... | S_t = s]
+$
 
 - donde $v_pi (s)$ es el valor esperado de estar en el estado s y seguir una política $pi$ a apartir de ese momento.
 - $EE_pi [.]$ indica el promedio ponderado de todos los posibles resultados, siguiendo la política $pi$.
@@ -106,5 +92,4 @@ Un *Modelo* predice que hará el entorno a continuación. Es una reresentación 
 - Transiciones $cal(P)$: predicen el siguiente estado, formalmente *$cal(P)^a_(s s') = PP[S_(t+1) = s' | S_t = s, A_t = a]$*. Es la probabilidad de que el próximo estado sea s' si ahora estas en s y haces a. En casos deterministas es igual a 0 o 1.
 - Recompensas $cal(R)$: predice la recompensa inmediata. Un modelo de recompensa predice cual será la recompensa inmediata que el agente recibirá después de ejecutar una acción específica. Formalmente *$cal(R)^a_t = EE [R_(t+1) | S_t = s, A_t = a]$*.
 
-
-
+#chapter-nav("introduccion.typ")

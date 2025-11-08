@@ -89,13 +89,92 @@
       }
 
       aside li {
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
       }
 
       aside a {
         display: block;
       }
+
+      /* SVG elements inherit fill for Dark Reader compatibility */
+      svg path, svg use {
+        fill: inherit;
+      }
+
+      /* Math equations: ensure they use currentColor for dark mode */
+      .dark-reader-fix-text svg {
+        color: inherit;
+      }
+
+      /* Override the #0a090b fill from Typst with currentColor */
+      .dark-reader-fix-text svg *[fill='#0a090b'] {
+        fill: currentColor;
+      }
+
+      /* Chapter navigation */
+      nav.chapter-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 0.125rem solid #667eea;
+      }
+
+      nav.chapter-nav a {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        border: 0.125rem solid #667eea;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s;
+        min-width: 10rem;
+      }
+
+      nav.chapter-nav a:hover {
+        background-color: rgba(102, 126, 234, 0.1);
+      }
+
+      nav.chapter-nav .nav-label {
+        font-size: 0.875rem;
+        opacity: 0.7;
+        margin-bottom: 0.25rem;
+      }
+
+      nav.chapter-nav .nav-title {
+        font-weight: 700;
+      }
+
+      nav.chapter-nav .nav-prev {
+        text-align: left;
+      }
+
+      nav.chapter-nav .nav-next {
+        text-align: right;
+        margin-left: auto;
+      }
     ")
+  }
+}
+
+
+#let fix-math(eq) = context {
+  // Target is the only thing here that needs a context block, This is the
+  // modern approach, but requires compilation with the html feature enabled
+  if target() == "html" {
+    // Use uncommon near-black color for HTML SVG generation
+    // #0a090b is visually identical to black but uncommon enough for post-processing
+    set text(fill: rgb("#0a090b"))
+    if eq.block {
+      html.div(class: ("math", "block", "dark-reader-fix-text"),
+        html.frame(eq)
+      )           // Block: div wraps SVG
+    } else {
+      box(html.span(class: ("inline-math", "dark-reader-fix-text"),
+        html.frame(eq)
+      ))      // Inline: box wraps span wraps SVG
+    }
+  } else {
+    eq                         // PDF: native math (uses default color)
   }
 }
 
@@ -104,3 +183,54 @@
     link(chapter.file.replace(".typ", ".html"), [#chapter.title])
   )
 ))
+
+// Chapter navigation (previous/next)
+#let chapter-nav(current-file) = context {
+  if target() == "html" {
+    // Find current chapter index
+    let current-idx = none
+    for (i, chapter) in chapters.enumerate() {
+      if chapter.file == current-file {
+        current-idx = i
+        break
+      }
+    }
+
+    if current-idx != none {
+      let nav-content = ()
+
+      // Previous chapter
+      if current-idx > 0 {
+        let prev = chapters.at(current-idx - 1)
+        nav-content.push(
+          html.a(
+            href: prev.file.replace(".typ", ".html"),
+            class: "nav-prev",
+          )[
+            #html.div(class: "nav-label")[$<-$ Previous]
+            #html.div(class: "nav-title")[#prev.title]
+          ]
+        )
+      }
+
+      // Next chapter
+      if current-idx < chapters.len() - 1 {
+        let next = chapters.at(current-idx + 1)
+        nav-content.push(
+          html.a(
+            href: next.file.replace(".typ", ".html"),
+            class: "nav-next",
+          )[
+            #html.div(class: "nav-label")[Next $->$]
+            #html.div(class: "nav-title")[#next.title]
+          ]
+        )
+      }
+
+      // Return navigation if there are any links
+      if nav-content.len() > 0 {
+        html.nav(class: "chapter-nav")[#nav-content.join()]
+      }
+    }
+  }
+}

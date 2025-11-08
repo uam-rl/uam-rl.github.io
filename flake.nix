@@ -122,6 +122,13 @@
 
       # Watch a project and recompile on changes
       watch-script = typixLib.watchTypstProject commonArgs;
+
+      # Build both HTML files into a single directory
+      build-html-dir = pkgs.runCommand "html-output" {} ''
+        mkdir -p $out
+        ln -s ${build-html} $out/main.html
+        ln -s ${build-introduccion-html} $out/introduccion.html
+      '';
     in {
       checks = {
         inherit build-drv build-script watch-script;
@@ -133,6 +140,7 @@
         html = build-html;
         introduccion-pdf = build-introduccion-pdf;
         introduccion-html = build-introduccion-html;
+        html-dir = build-html-dir;
       };
 
       apps = rec {

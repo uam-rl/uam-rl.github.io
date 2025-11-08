@@ -7,33 +7,17 @@
   )
 )
 
-// Automatic math equation handling with show rule
-#show math.equation: it => context {
-  // Target is the only thing here that needs a context block, This is the
-  // modern approach, but requires compilation with the html feature enabled
-  if target() == "html" {
-    // Use uncommon near-black color for HTML SVG generation
-    // #0a0a0a is visually identical to black but uncommon enough for post-processing
-    set text(fill: rgb("#0a0a0a"))
-    if it.block {
-      html.frame(it)           // Block: standalone SVG
-    } else {
-      box(html.frame(it))      // Inline: wrapped SVG
-    }
-  } else {
-    it                         // PDF: native math (uses default color)
-  }
-}
+// Import chapter configuration, sidebar, centralized CSS, and math fix
+#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav
 
-// Import chapter configuration, sidebar, and centralized CSS
-#import "chapters.typ": sidebar, inject-all-css
+// Apply centralized math equation handling
+#show math.equation: fix-math
 
 // Apply CSS injection using html.elem
 #inject-all-css()
 
 // Set font for both PDF and HTML
 #set text(font: "New Computer Modern", size: 11pt)
-#show raw: set text(font: "New Computer Modern Mono")
 
 #set heading(numbering: "1.")
 #show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
@@ -78,4 +62,6 @@ $ J(pi) = EE_(tau tilde pi) [sum_(t=0)^infinity gamma^t r_t] $
 == Get Involved
 
 Visit our GitHub organization at https://github.com/uam-rl to explore our projects and contribute to our research.
+
+#chapter-nav("main.typ")
 
