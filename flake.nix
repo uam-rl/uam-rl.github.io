@@ -34,6 +34,10 @@
 
       # Python script for post-processing HTML
       fixSvgScript = ./fix-svg-fills.py;
+
+      # Load chapter configuration from TOML
+      chaptersData = builtins.fromTOML (builtins.readFile ./typst-src/chapters.toml);
+      chapters = chaptersData.chapters;
       commonArgs = {
         typstSource = "typst-src/main.typ";
 
@@ -48,6 +52,10 @@
           #   dest = "icons";
           #   src = "${inputs.font-awesome}/svgs/regular";
           # }
+          {
+            dest = "typst-src/chapters.toml";
+            src = "${./typst-src/chapters.toml}";
+          }
         ];
       };
 
@@ -65,49 +73,47 @@
         }
       ];
 
-      # Build PDF in sandbox (with html features for html.aside etc)
-      build-pdf = typixLib.buildTypstProject (commonArgs
+      # Helper functions to build chapters
+      mkChapterPdf = chapter: typixLib.buildTypstProject (commonArgs
         // {
           inherit src unstable_typstPackages;
-          name = "main.pdf";
+          typstSource = "typst-src/${chapter.file}";
+          name = lib.replaceStrings [".typ"] [".pdf"] chapter.file;
           typstCompileCommand = "typst compile --features html";
         });
 
-      # Build HTML in sandbox with SVG fix
-      build-html = typixLib.buildTypstProject (commonArgs
+      mkChapterHtml = chapter: typixLib.buildTypstProject (commonArgs
         // {
           inherit src unstable_typstPackages;
-          name = "main.html";
+          typstSource = "typst-src/${chapter.file}";
+          name = lib.replaceStrings [".typ"] [".html"] chapter.file;
           nativeBuildInputs = [ pkgs.python3 ];
           buildPhaseTypstCommand = ''
-            typst compile --features html ${commonArgs.typstSource} temp.html
+            typst compile --features html typst-src/${chapter.file} temp.html
             python3 ${fixSvgScript} temp.html
             mv temp.html "$out"
           '';
         });
 
-      # Build introduccion PDF in sandbox (with html features for html.aside etc)
-      build-introduccion-pdf = typixLib.buildTypstProject (commonArgs
-        // {
-          inherit src unstable_typstPackages;
-          typstSource = "typst-src/introduccion.typ";
-          name = "introduccion.pdf";
-          typstCompileCommand = "typst compile --features html";
-        });
+      # Generate builds for all chapters dynamically
+      chapterBuilds = lib.listToAttrs (lib.flatten (map (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+        in [
+          {
+            name = "${baseName}-pdf";
+            value = mkChapterPdf chapter;
+          }
+          {
+            name = "${baseName}-html";
+            value = mkChapterHtml chapter;
+          }
+        ]
+      ) chapters));
 
-      # Build introduccion HTML in sandbox with SVG fix
-      build-introduccion-html = typixLib.buildTypstProject (commonArgs
-        // {
-          inherit src unstable_typstPackages;
-          typstSource = "typst-src/introduccion.typ";
-          name = "introduccion.html";
-          nativeBuildInputs = [ pkgs.python3 ];
-          buildPhaseTypstCommand = ''
-            typst compile --features html typst-src/introduccion.typ temp.html
-            python3 ${fixSvgScript} temp.html
-            mv temp.html "$out"
-          '';
-        });
+      # Convenience aliases for the first chapter (main)
+      build-pdf = chapterBuilds.main-pdf;
+      build-html = chapterBuilds.main-html;
 
       # Compile a Typst project, *without* copying the result
       # to the current directory
@@ -123,14 +129,35 @@
       # Watch a project and recompile on changes
       watch-script = typixLib.watchTypstProject commonArgs;
 
-      # Build both HTML files into a single directory
-      build-html-dir = pkgs.runCommand "html-output" {} ''
+      # Build all HTML files into a single directory
+      build-html-dir = pkgs.runCommand "html-output" {} (''
         mkdir -p $out
-        # Copy the built HTML files instead of symlinking so the result
-        # directory can be moved or served without depending on /nix/store.
-        cp ${build-html} $out/main.html
-        cp ${build-introduccion-html} $out/introduccion.html
-      '';
+        # Copy all HTML files from chapters
+      '' + lib.concatMapStringsSep "\n" (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+          htmlBuild = chapterBuilds."${baseName}-html";
+        in
+          "cp ${htmlBuild} $out/${baseName}.html"
+      ) chapters);
+
+      # Build all PDFs and HTMLs for deployment
+      build-all = pkgs.runCommand "deploy-output" {} (''
+        mkdir -p $out
+        # Copy all PDFs and HTMLs from chapters
+      '' + lib.concatMapStringsSep "\n" (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+          pdfBuild = chapterBuilds."${baseName}-pdf";
+          htmlBuild = chapterBuilds."${baseName}-html";
+        in ''
+          cp ${pdfBuild} $out/${baseName}.pdf
+          cp ${htmlBuild} $out/${baseName}.html
+        ''
+      ) chapters + ''
+        # Copy main.html to index.html for GitHub Pages
+        cp $out/main.html $out/index.html
+      '');
     in {
       checks = {
         inherit build-drv build-script watch-script;
@@ -140,10 +167,9 @@
         default = build-drv;
         pdf = build-pdf;
         html = build-html;
-        introduccion-pdf = build-introduccion-pdf;
-        introduccion-html = build-introduccion-html;
         html-dir = build-html-dir;
-      };
+        all = build-all;
+      } // chapterBuilds;
 
       apps = rec {
         default = watch;

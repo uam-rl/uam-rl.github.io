@@ -7,17 +7,8 @@
   )
 )
 
-// Central chapter configuration
-#let chapters = (
-  (
-    title: "UAM RL",
-    file: "main.typ",
-  ),
-  (
-    title: "Introducción",
-    file: "introduccion.typ",
-  ),
-)
+// Central chapter configuration - loaded from chapters.toml
+#let chapters = toml("chapters.toml").chapters
 
 // Centralized CSS for all HTML pages
 #let inject-all-css() = context {
@@ -238,10 +229,8 @@
   body,
   current-file: none,
 ) = {
-  // Ensure shared CSS is injected when targeting HTML
   inject-all-css()
 
-  // Shared typography + heading styling
   set text(font: "New Computer Modern", size: 11pt)
   set heading(numbering: "1.")
   show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
