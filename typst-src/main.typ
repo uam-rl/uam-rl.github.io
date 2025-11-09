@@ -1,7 +1,3 @@
-// Import chapter configuration, sidebar, centralized CSS, and math fix
-#import "chapters.typ": sidebar, inject-all-css, fix-math, chapter-nav, theme
-
-
 #import "chapters.typ" as tp
 #show: tp.cool-web-page.with(
   current-file: "main.typ",
