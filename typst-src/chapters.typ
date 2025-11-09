@@ -1,9 +1,9 @@
-
+#import "@preview/oxifmt:1.0.0": strfmt
 #let theme = (
   colors: (
-    primary: rgb("#667eea"),
+    primary:   rgb("#667eea"),
     secondary: rgb("#764ba2"),
-    text: rgb("#1d1d1d"),
+    text:      rgb("#1d1d1d"),
   )
 )
 
@@ -22,133 +22,138 @@
 // Centralized CSS for all HTML pages
 #let inject-all-css() = context {
   if target() == "html" {
-    html.elem("style", "
+    html.elem("style", strfmt("
       /* Web fonts */
       @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-sans@5.0.0/400.css');
       @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-sans@5.0.0/700.css');
       @import url('https://cdn.jsdelivr.net/npm/@fontsource/dejavu-mono@5.0.0/index.css');
 
       /* Body and layout */
-      body {
+      body {{
         font-family: 'DejaVu Sans', 'Verdana', sans-serif;
         max-width: 65ch;
         margin: 0 auto;
         padding: 2rem;
         /* Center content in the space remaining after sidebar */
         margin-left: calc((100vw + 11.25rem - 65ch) / 2);
-      }
+      }}
 
       /* Code blocks */
-      code, pre {
+      code, pre {{
         font-family: 'DejaVu Mono', 'DejaVu Sans Mono', 'Consolas', monospace;
-      }
+      }}
 
       /* Headings */
-      h1, h2, h3 {
-        color: #667eea;
+      h1, h2, h3 {{
+        color: {primary};
         font-weight: 700;
-      }
+      }}
 
       /* Bold text */
-      strong, b {
+      strong, b {{
         font-weight: 700;
-      }
+      }}
 
       /* SVG styling */
-      svg {
+      svg {{
         margin: 1.5em auto;
         display: block;
         border-radius: 0.5rem;
-      }
+      }}
 
-      span svg {
+      span svg {{
         margin: 0;
         display: inline-block;
         vertical-align: middle;
-      }
+      }}
 
       /* Links */
-      a {
-        color: #667eea;
+      a {{
+        color: {primary};
         text-decoration: none;
-      }
+      }}
 
-      a:hover {
-        color: #764ba2;
-      }
+      a:hover {{
+        color: {secondary};
+      }}
 
       /* Sidebar */
-      aside {
+      aside {{
         position: fixed;
         left: 0;
         top: 0;
         width: 11.25rem;
         height: 100vh;
-        border-right: 0.125rem solid #667eea;
+        border-right: 0.125rem solid {primary};
         padding: 2rem 1rem;
         overflow-y: auto;
         box-sizing: border-box;
-      }
+      }}
 
       /* Remove list markers and default spacing */
-      aside ul {
+      aside ul {{
         list-style: none;
         padding: 0;
         margin: 0;
-      }
+      }}
 
-      aside li {
+      aside li {{
         margin-bottom: 2rem;
-      }
+      }}
 
-      aside a {
+      aside a {{
         display: block;
-      }
+      }}
 
       /* Chapter navigation */
-      nav.chapter-nav {
+      nav.chapter-nav {{
         display: flex;
         justify-content: space-between;
         margin-top: 4rem;
         padding-top: 2rem;
-        border-top: 0.125rem solid #667eea;
-      }
+        border-top: 0.125rem solid {primary};
+      }}
 
-      nav.chapter-nav a {
+      nav.chapter-nav a {{
         display: flex;
         flex-direction: column;
         padding: 1rem;
-        border: 0.125rem solid #667eea;
+        border: 0.125rem solid {primary};
         border-radius: 0.5rem;
         transition: background-color 0.2s;
         min-width: 10rem;
-      }
+      }}
 
-      nav.chapter-nav a:hover {
-        background-color: rgba(102, 126, 234, 0.1);
-      }
+      nav.chapter-nav a:hover {{
+        background-color: {primary-100};
+      }}
 
-      nav.chapter-nav .nav-label {
+      nav.chapter-nav .nav-label {{
         font-size: 0.875rem;
         opacity: 0.7;
         margin-bottom: 0.25rem;
-      }
+      }}
 
-      nav.chapter-nav .nav-title {
+      nav.chapter-nav .nav-title {{
         font-weight: 700;
-      }
+      }}
 
-      nav.chapter-nav .nav-prev {
+      nav.chapter-nav .nav-prev {{
         text-align: left;
-      }
+      }}
 
-      nav.chapter-nav .nav-next {
+      nav.chapter-nav .nav-next {{
         text-align: right;
         margin-left: auto;
-      }
-    ")
+      }}
+    ",
+    primary:     theme.colors.primary.to-hex(),
+    secondary:   theme.colors.secondary.to-hex(),
+    primary-100: theme.colors.primary.transparentize(90%).to-hex(),
+    ))
   }
 }
+
 
 
 #let fix-math(eq) = context {
