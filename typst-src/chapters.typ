@@ -233,6 +233,15 @@
   body,
   current-file: none,
 ) = {
+  // Ensure shared CSS is injected when targeting HTML
+  inject-all-css()
+
+  // Shared typography + heading styling
+  set text(font: "New Computer Modern", size: 11pt)
+  set heading(numbering: "1.")
+  show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
+  show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
+
   show math.equation: fix-math
   sidebar
   body
