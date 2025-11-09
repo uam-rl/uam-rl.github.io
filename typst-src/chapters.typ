@@ -237,7 +237,11 @@
   show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
 
   show math.equation: fix-math
-  sidebar
+  context {
+    if target() == "html" {
+      sidebar
+    }
+  }
   body
 
 
