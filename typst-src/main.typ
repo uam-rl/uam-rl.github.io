@@ -1,4 +1,4 @@
-#import "chapters.typ" as tp
+#import "template.typ" as tp
 #show: tp.cool-web-page.with(
   current-file: "main.typ",
 )
