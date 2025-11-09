@@ -54,14 +54,14 @@
       unstable_typstPackages = [
         {
           name = "cetz";
-          version = "0.3.4";
-          hash = "sha256-5w3UYRUSdi4hCvAjrp9HslzrUw7BhgDdeCiDRHGvqd4=";
+          version = "0.4.2";
+          hash = "sha256-qBIEHqtiMSG/WoXHPC/rQ9VkestSvVNlUwTmAMX1wAs=";
         }
         # Required by cetz
         {
           name = "oxifmt";
-          version = "0.2.1";
-          hash = "sha256-8PNPa9TGFybMZ1uuJwb5ET0WGIInmIgg8h24BmdfxlU=";
+          version = "1.0.0";
+          hash = "sha256-edTDK5F2xFYWypGpR0dWxwM7IiBd8hKGQ0KArkbpHvI=";
         }
       ];
 
