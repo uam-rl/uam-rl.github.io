@@ -246,5 +246,6 @@
   sidebar
   body
 
+
   chapter-nav(current-file)
 }
