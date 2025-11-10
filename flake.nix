@@ -33,7 +33,7 @@
       src = typixLib.cleanTypstSource ./.;
 
       # Python script for post-processing HTML
-      fixSvgScript = ./fix-svg-fills.py;
+      fixSvgScript = ./typst-src/fix-svg-fills.py;
 
       # Load chapter configuration from TOML
       chaptersData = builtins.fromTOML (builtins.readFile ./typst-src/chapters.toml);
