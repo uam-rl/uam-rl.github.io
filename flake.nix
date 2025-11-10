@@ -56,6 +56,10 @@
             dest = "typst-src/chapters.toml";
             src = "${./typst-src/chapters.toml}";
           }
+          {
+            dest = "typst-src/github.svg";
+            src = "${./typst-src/github.svg}";
+          }
         ];
       };
 
