@@ -128,10 +128,31 @@
       build-script = typixLib.buildTypstProjectLocal (commonArgs
         // {
           inherit src unstable_typstPackages;
+          typstCompileCommand = "typst compile --features html";
         });
 
       # Watch a project and recompile on changes
-      watch-script = typixLib.watchTypstProject commonArgs;
+      watch-script = typixLib.watchTypstProject (commonArgs
+        // {
+          typstWatchCommand = "typst watch --features html";
+        });
+
+      # Helper to create watch scripts for each chapter
+      mkChapterWatch = chapter: typixLib.watchTypstProject (commonArgs
+        // {
+          typstSource = "typst-src/${chapter.file}";
+          typstWatchCommand = "typst watch --features html";
+        });
+
+      # Generate watch scripts for all chapters dynamically
+      chapterWatchScripts = lib.listToAttrs (map (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+        in {
+          name = "watch-${baseName}";
+          value = mkChapterWatch chapter;
+        }
+      ) chapters);
 
       # Build all HTML files into a single directory
       build-html-dir = pkgs.runCommand "html-output" {} (''
@@ -162,6 +183,9 @@
         # Copy main.html to index.html for GitHub Pages
         cp $out/main.html $out/index.html
       '');
+
+      # Generate apps for chapter watch scripts
+      chapterWatchApps = lib.mapAttrs (name: drv: flake-utils.lib.mkApp { inherit drv; }) chapterWatchScripts;
     in {
       checks = {
         inherit build-drv build-script watch-script;
@@ -183,7 +207,7 @@
         watch = flake-utils.lib.mkApp {
           drv = watch-script;
         };
-      };
+      } // chapterWatchApps;
 
       devShells.default = typixLib.devShell {
         inherit (commonArgs) fontPaths virtualPaths;
