@@ -79,6 +79,14 @@
         padding: 2rem 1rem;
         overflow-y: auto;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+      }}
+
+      aside .sidebar-footer {{
+        margin-top: auto;
+        text-align: center;
+        padding-top: 2rem;
       }}
 
       /* Remove list markers and default spacing */
@@ -168,11 +176,20 @@
   }
 }
 
-#let sidebar = html.aside(list(
-  ..chapters.map(chapter =>
-    link(chapter.file.replace(".typ", ".html"), [#chapter.title])
+#let sidebar = html.aside([
+  #list(
+    ..chapters.map(chapter =>
+      link(chapter.file.replace(".typ", ".html"), [#chapter.title])
+    )
   )
-))
+
+  #html.div(class: "sidebar-footer")[
+    #link("https://github.com/uam-rl/uam-rl.github.io")[
+      #box(image("github.svg", width: 1.5em), baseline: 0.1em)
+      Source
+    ]
+  ]
+])
 
 // Chapter navigation (previous/next)
 #let chapter-nav(current-file) = context {
@@ -236,6 +253,9 @@
   show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
   show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
 
+  // Make links blue in PDFs
+  show link: set text(fill: theme.colors.primary)
+
   show math.equation: fix-math
   context {
     if target() == "html" {
@@ -246,4 +266,17 @@
 
 
   chapter-nav(current-file)
+
+  // GitHub logo at bottom for PDFs
+  context {
+    if target() != "html" {
+      v(2em)
+      align(center)[
+        #link("https://github.com/uam-rl/uam-rl.github.io")[
+          #box(image("github.svg", width: 1em), baseline: 0.1em)
+          github.com/uam-rl/uam-rl.github.io
+        ]
+      ]
+    }
+  }
 }

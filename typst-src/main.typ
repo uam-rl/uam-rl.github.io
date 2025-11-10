@@ -8,10 +8,6 @@
 
 Welcome to the UAM Reinforcement Learning Organization.
 
-View the source code for this page on github:
-#box(image("github.svg", width: 1em), baseline: 0.1em)
-#link("https://github.com/uam-rl/uam-rl.github.io")[github.com/uam-rl/uam-rl.github.io]
-
 == About
 
 This organization is dedicated to reinforcement learning research, implementations, and educational resources.
