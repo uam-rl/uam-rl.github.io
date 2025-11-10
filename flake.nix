@@ -60,6 +60,10 @@
             dest = "typst-src/github.svg";
             src = "${./typst-src/github.svg}";
           }
+          {
+            dest = "typst-src/project-icon.png";
+            src = "${./typst-src/project-icon.png}";
+          }
         ];
       };
 
@@ -182,6 +186,8 @@
       ) chapters + ''
         # Copy main.html to index.html for GitHub Pages
         cp $out/main.html $out/index.html
+        # Copy static assets referenced by the HTML pages
+        cp ${./typst-src/project-icon.png} $out/project-icon.png
       '');
 
       # Generate apps for chapter watch scripts

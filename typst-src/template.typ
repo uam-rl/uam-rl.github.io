@@ -10,6 +10,12 @@
 // Central chapter configuration - loaded from chapters.toml
 #let chapters = toml("chapters.toml").chapters
 
+#let favicon = html.link(
+  rel: "icon",
+  href: "project-icon.png",
+  type: "image/svg+xml"
+)
+
 // Centralized CSS for all HTML pages
 #let inject-all-css() = context {
   if target() == "html" {
@@ -246,6 +252,11 @@
   body,
   current-file: none,
 ) = {
+  context {
+    if target() == "html" {
+      favicon
+     }
+  }
   inject-all-css()
 
   set text(font: "New Computer Modern", size: 11pt)
