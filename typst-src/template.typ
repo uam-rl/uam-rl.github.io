@@ -89,6 +89,19 @@
         flex-direction: column;
       }}
 
+      aside .sidebar-header {{
+        text-align: center;
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 0.125rem solid {primary};
+      }}
+
+      aside .sidebar-header img {{
+        width: 70%;
+        max-width: 100%;
+        height: auto;
+      }}
+
       aside .sidebar-footer {{
         margin-top: auto;
         text-align: center;
@@ -183,6 +196,13 @@
 }
 
 #let sidebar = html.aside([
+  #html.div(class: "sidebar-header")[
+    #html.img(
+      src: "project-icon.png",
+      alt: "UAM RL Project Icon"
+    )
+  ]
+
   #list(
     ..chapters.map(chapter =>
       link(chapter.file.replace(".typ", ".html"), [#chapter.title])
