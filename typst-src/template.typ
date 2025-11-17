@@ -16,6 +16,44 @@
   type: "image/svg+xml"
 )
 
+// Theme toggle JavaScript
+#let inject-theme-js() = context {
+  if target() == "html" {
+    // Inline script to load theme before page renders (avoid flash)
+    html.elem("script", "
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = savedTheme === 'dark' || (savedTheme === null && systemPrefersDark);
+
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    ")
+
+    // Main theme toggle functionality
+    html.elem("script", "
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.toggle('dark-theme');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+        // Update button emoji
+        const btn = document.getElementById('theme-toggle');
+        if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+      }
+
+      // Set initial button emoji based on current theme
+      window.addEventListener('DOMContentLoaded', () => {
+        const isDark = document.documentElement.classList.contains('dark-theme');
+        const btn = document.getElementById('theme-toggle');
+        if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+      });
+    ")
+  }
+}
+
 // Centralized CSS for all HTML pages
 #let inject-all-css() = context {
   if target() == "html" {
@@ -33,6 +71,20 @@
         padding: 2rem;
         /* Center content in the space remaining after sidebar */
         margin-left: calc((100vw + 11.25rem - 65ch) / 2);
+        background-color: #ffffff;
+        color: #1d1d1d;
+        transition: background-color 0.3s, color 0.3s;
+      }}
+
+      /* Dark theme styles */
+      .dark-theme body {{
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+      }}
+
+      .dark-theme aside {{
+        background-color: #2d2d2d;
+        border-right-color: #8b9cff;
       }}
 
       /* Code blocks */
@@ -100,6 +152,21 @@
         width: 70%;
         max-width: 100%;
         height: auto;
+      }}
+
+      /* Theme toggle button */
+      #theme-toggle {{
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0.5em;
+        margin-bottom: 0.5em;
+        transition: transform 0.2s;
+      }}
+
+      #theme-toggle:hover {{
+        transform: scale(1.2);
       }}
 
       aside .sidebar-footer {{
@@ -197,6 +264,16 @@
 
 #let sidebar = html.aside([
   #html.div(class: "sidebar-header")[
+    // Note: html.button() doesn't support onclick or id attributes.
+    // We use html.elem() with attrs dictionary to add custom HTML attributes.
+    // See references/html-elem.md for documentation.
+    #html.elem("button", attrs: (
+      id: "theme-toggle",
+      onclick: "toggleTheme()",
+      type: "button",
+      aria-label: "Toggle dark mode"
+    ))[🌙]
+
     #html.img(
       src: "project-icon.png",
       alt: "UAM RL Project Icon"
@@ -278,6 +355,7 @@
      }
   }
   inject-all-css()
+  inject-theme-js()
 
   set text(font: "New Computer Modern", size: 11pt)
   set heading(numbering: "1.")
