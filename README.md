@@ -18,13 +18,28 @@ document.
 
 From the root of the project, run
 ```sh
-nix build #.all
+nix build .#all
 ls result
 ```
-the result should in in `./result`, this includes several HTML and PDF files.
+the result should in in `./result`, this includes all HTML files, light PDFs, and dark PDFs.
 
 ```
-index.html  introduccion.html  introduccion.pdf  main.html  main.pdf
+index.html  introduccion.html  introduccion.pdf  introduccion-dark.pdf  main.html  main.pdf  main-dark.pdf
+```
+
+To build all PDFs (both light and dark):
+```sh
+nix build .#pdf
+```
+
+To build only light PDFs:
+```sh
+nix build .#light-pdf
+```
+
+To build only dark PDFs:
+```sh
+nix build .#dark-pdf
 ```
 
 #### Building a single page or file
@@ -35,13 +50,20 @@ index.html  introduccion.html  introduccion.pdf  main.html  main.pdf
 nix build .#main-pdf           # Build main.pdf
 nix build .#introduccion-pdf   # Build introduccion.pdf
 
+# Build dark theme PDFs:
+
+nix build .#main-pdf-dark           # Build main-dark.pdf
+nix build .#introduccion-pdf-dark   # Build introduccion-dark.pdf
+
 # Build single chapter HTML:
 
 nix build .#main-html           # Build main.html
-nix build .#introduccion-html   # Build introduccion.html 
+nix build .#introduccion-html   # Build introduccion.html
 ```
 
 after building, the result will be in `./result` as before.
+
+**Note:** Dark theme PDFs have a dark background and light text, ideal for night reading.
 
 ### Without nix
 
@@ -50,6 +72,9 @@ after building, the result will be in `./result` as before.
    ```sh
    typst compile --features html typst-src/main.typ build/main.html
    typst compile --features html typst-src/main.typ build/main.pdf
+
+   # For dark theme PDFs, add --input theme=dark:
+   typst compile --features html --input theme=dark typst-src/main.typ build/main-dark.pdf
    ```
    Replace `main.typ` with any chapter listed in `typst-src/chapters.toml`.
 

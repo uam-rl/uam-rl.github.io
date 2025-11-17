@@ -4,6 +4,20 @@
     primary:   rgb("#667eea"),
     secondary: rgb("#764ba2"),
     text:      rgb("#1d1d1d"),
+  ),
+  light: (
+    bg:        rgb("#ffffff"),
+    text:      rgb("#1d1d1d"),
+    sidebar:   rgb("#f8f9fa"),
+    border:    rgb("#667eea"),
+    code-bg:   rgb("#f5f5f5"),
+  ),
+  dark: (
+    bg:        rgb("#1a1a1a"),
+    text:      rgb("#e0e0e0"),
+    sidebar:   rgb("#2d2d2d"),
+    border:    rgb("#8b9cff"),
+    code-bg:   rgb("#2a2a2a"),
   )
 )
 
@@ -71,20 +85,20 @@
         padding: 2rem;
         /* Center content in the space remaining after sidebar */
         margin-left: calc((100vw + 11.25rem - 65ch) / 2);
-        background-color: #ffffff;
-        color: #1d1d1d;
+        background-color: {light-bg};
+        color: {light-text};
         transition: background-color 0.3s, color 0.3s;
       }}
 
       /* Dark theme styles */
       .dark-theme body {{
-        background-color: #1a1a1a;
-        color: #e0e0e0;
+        background-color: {dark-bg};
+        color: {dark-text};
       }}
 
       .dark-theme aside {{
-        background-color: #2d2d2d;
-        border-right-color: #8b9cff;
+        background-color: {dark-sidebar};
+        border-right-color: {dark-border};
       }}
 
       /* Code blocks */
@@ -235,6 +249,18 @@
     primary:     theme.colors.primary.to-hex(),
     secondary:   theme.colors.secondary.to-hex(),
     primary-100: theme.colors.primary.transparentize(90%).to-hex(),
+    // Light theme colors
+    light-bg:       theme.light.bg.to-hex(),
+    light-text:     theme.light.text.to-hex(),
+    light-sidebar:  theme.light.sidebar.to-hex(),
+    light-border:   theme.light.border.to-hex(),
+    light-code-bg:  theme.light.code-bg.to-hex(),
+    // Dark theme colors
+    dark-bg:        theme.dark.bg.to-hex(),
+    dark-text:      theme.dark.text.to-hex(),
+    dark-sidebar:   theme.dark.sidebar.to-hex(),
+    dark-border:    theme.dark.border.to-hex(),
+    dark-code-bg:   theme.dark.code-bg.to-hex(),
     ))
   }
 }
@@ -357,13 +383,45 @@
   inject-all-css()
   inject-theme-js()
 
-  set text(font: "New Computer Modern", size: 11pt)
-  set heading(numbering: "1.")
-  show heading.where(level: 1): set text(size: 2.25em, weight: 700, fill: theme.colors.primary)
-  show heading.where(level: 2): set text(size: 1.5em, weight: 600, fill: theme.colors.primary)
+  // Determine theme for PDFs from sys.inputs (defaults to "light")
+  let pdf-theme = sys.inputs.at("theme", default: "light")
+  let use-dark = pdf-theme == "dark"
 
-  // Make links blue in PDFs
-  show link: set text(fill: theme.colors.primary)
+  // Apply theme colors to PDFs
+  // Note: set/show rules inside conditionals (if/else blocks) don't work at the
+  // function scope level. Instead, use conditional expressions inside the set/show
+  // rules themselves. This ensures the rules are always active with dynamically
+  // computed values.
+  // Page configuration only applies to PDFs (not allowed in HTML), so we use a
+  // show rule to conditionally apply it based on target()
+  show: it => context {
+    if target() != "html" {
+      set page(fill: if use-dark { theme.dark.bg } else { white })
+      it
+    } else {
+      it
+    }
+  }
+
+  set text(
+    fill: if use-dark { theme.dark.text } else { black },
+    font: "New Computer Modern",
+    size: 11pt
+  )
+  set heading(numbering: "1.")
+
+  // Use theme-appropriate colors for headings - conditional inside show rules
+  show heading.where(level: 1): set text(
+    size: 2.25em,
+    weight: 700,
+    fill: if use-dark { theme.dark.border } else { theme.colors.primary }
+  )
+  show heading.where(level: 2): set text(
+    size: 1.5em,
+    weight: 600,
+    fill: if use-dark { theme.dark.border } else { theme.colors.primary }
+  )
+  show link: set text(fill: if use-dark { theme.dark.border } else { theme.colors.primary })
 
   show math.equation: fix-math
   context {
@@ -372,7 +430,6 @@
     }
   }
   body
-
 
   chapter-nav(current-file)
 

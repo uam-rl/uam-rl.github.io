@@ -90,6 +90,14 @@
           typstCompileCommand = "typst compile --features html";
         });
 
+      mkChapterPdfDark = chapter: typixLib.buildTypstProject (commonArgs
+        // {
+          inherit src unstable_typstPackages;
+          typstSource = "typst-src/${chapter.file}";
+          name = lib.replaceStrings [".typ"] ["-dark.pdf"] chapter.file;
+          typstCompileCommand = "typst compile --features html --input theme=dark";
+        });
+
       mkChapterHtml = chapter: typixLib.buildTypstProject (commonArgs
         // {
           inherit src unstable_typstPackages;
@@ -113,6 +121,10 @@
             value = mkChapterPdf chapter;
           }
           {
+            name = "${baseName}-pdf-dark";
+            value = mkChapterPdfDark chapter;
+          }
+          {
             name = "${baseName}-html";
             value = mkChapterHtml chapter;
           }
@@ -120,12 +132,11 @@
       ) chapters));
 
       # Convenience aliases for the first chapter (main)
-      build-pdf = chapterBuilds.main-pdf;
       build-html = chapterBuilds.main-html;
 
       # Compile a Typst project, *without* copying the result
       # to the current directory
-      build-drv = build-pdf;
+      build-drv = chapterBuilds.main-pdf;
 
       # Compile a Typst project, and then copy the result
       # to the current directory
@@ -170,17 +181,60 @@
           "cp ${htmlBuild} $out/${baseName}.html"
       ) chapters);
 
-      # Build all PDFs and HTMLs for deployment
-      build-all = pkgs.runCommand "deploy-output" {} (''
+      # Build all light PDFs
+      build-light-pdf = pkgs.runCommand "light-pdfs" {} (''
         mkdir -p $out
-        # Copy all PDFs and HTMLs from chapters
+        # Copy all light PDFs from chapters
       '' + lib.concatMapStringsSep "\n" (chapter:
         let
           baseName = lib.removeSuffix ".typ" chapter.file;
           pdfBuild = chapterBuilds."${baseName}-pdf";
+        in ''
+          cp ${pdfBuild} $out/${baseName}.pdf
+        ''
+      ) chapters);
+
+      # Build all dark PDFs
+      build-dark-pdf = pkgs.runCommand "dark-pdfs" {} (''
+        mkdir -p $out
+        # Copy all dark PDFs from chapters
+      '' + lib.concatMapStringsSep "\n" (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+          pdfDarkBuild = chapterBuilds."${baseName}-pdf-dark";
+        in ''
+          cp ${pdfDarkBuild} $out/${baseName}-dark.pdf
+        ''
+      ) chapters);
+
+      # Build all PDFs (both light and dark)
+      build-pdf = pkgs.runCommand "all-pdfs" {} (''
+        mkdir -p $out
+        # Copy all PDFs (light and dark) from chapters
+      '' + lib.concatMapStringsSep "\n" (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+          pdfBuild = chapterBuilds."${baseName}-pdf";
+          pdfDarkBuild = chapterBuilds."${baseName}-pdf-dark";
+        in ''
+          cp ${pdfBuild} $out/${baseName}.pdf
+          cp ${pdfDarkBuild} $out/${baseName}-dark.pdf
+        ''
+      ) chapters);
+
+      # Build everything: light PDFs, dark PDFs, and HTMLs
+      build-all = pkgs.runCommand "deploy-output-all" {} (''
+        mkdir -p $out
+        # Copy all PDFs (light and dark) and HTMLs from chapters
+      '' + lib.concatMapStringsSep "\n" (chapter:
+        let
+          baseName = lib.removeSuffix ".typ" chapter.file;
+          pdfBuild = chapterBuilds."${baseName}-pdf";
+          pdfDarkBuild = chapterBuilds."${baseName}-pdf-dark";
           htmlBuild = chapterBuilds."${baseName}-html";
         in ''
           cp ${pdfBuild} $out/${baseName}.pdf
+          cp ${pdfDarkBuild} $out/${baseName}-dark.pdf
           cp ${htmlBuild} $out/${baseName}.html
         ''
       ) chapters + ''
@@ -199,10 +253,12 @@
 
       packages = {
         default = build-drv;
-        pdf = build-pdf;
+        pdf = build-pdf;           # All PDFs (light and dark)
+        light-pdf = build-light-pdf;  # All light PDFs
+        dark-pdf = build-dark-pdf;    # All dark PDFs
         html = build-html;
         html-dir = build-html-dir;
-        all = build-all;
+        all = build-all;           # Everything: light PDFs, dark PDFs, HTMLs
       } // chapterBuilds;
 
       apps = rec {
