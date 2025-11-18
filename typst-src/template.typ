@@ -60,9 +60,11 @@
 
       // Set initial button emoji based on current theme
       window.addEventListener('DOMContentLoaded', () => {
-        const isDark = document.documentElement.classList.contains('dark-theme');
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark-theme');
         const btn = document.getElementById('theme-toggle');
         if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        html.classList.add('theme-transition');
       });
     ")
   }
@@ -87,6 +89,9 @@
         margin-left: calc((100vw + 11.25rem - 65ch) / 2);
         background-color: {light-bg};
         color: {light-text};
+      }}
+
+      .theme-transition body {{
         transition: background-color 0.3s, color 0.3s;
       }}
 
