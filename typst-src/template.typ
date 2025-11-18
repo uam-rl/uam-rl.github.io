@@ -40,8 +40,14 @@
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const shouldBeDark = savedTheme === 'dark' || (savedTheme === null && systemPrefersDark);
 
+        const savedSidebar = localStorage.getItem('sidebar');
+        const html = document.documentElement;
+
         if (shouldBeDark) {
-          document.documentElement.classList.add('dark-theme');
+          html.classList.add('dark-theme');
+        }
+        if (savedSidebar === 'collapsed') {
+          html.classList.add('sidebar-collapsed');
         }
       })();
     ")
@@ -53,18 +59,37 @@
         const isDark = html.classList.toggle('dark-theme');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
 
-        // Update button emoji
         const btn = document.getElementById('theme-toggle');
         if (btn) btn.textContent = isDark ? '☀️' : '🌙';
       }
 
-      // Set initial button emoji based on current theme
+      function updateSidebarToggle() {
+        const html = document.documentElement;
+        const collapsed = html.classList.contains('sidebar-collapsed');
+        const btn = document.getElementById('sidebar-toggle');
+        if (btn) {
+          btn.textContent = collapsed ? '☰' : '✕';
+          btn.setAttribute('aria-expanded', String(!collapsed));
+          btn.setAttribute('aria-label', collapsed ? 'Open navigation menu' : 'Close navigation menu');
+        }
+        const sidebar = document.querySelector('.site-sidebar');
+        if (sidebar) sidebar.setAttribute('aria-hidden', collapsed ? 'true' : 'false');
+      }
+
+      function toggleSidebar() {
+        const html = document.documentElement;
+        const collapsed = html.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebar', collapsed ? 'collapsed' : 'expanded');
+        updateSidebarToggle();
+      }
+
       window.addEventListener('DOMContentLoaded', () => {
         const html = document.documentElement;
         const isDark = html.classList.contains('dark-theme');
         const btn = document.getElementById('theme-toggle');
         if (btn) btn.textContent = isDark ? '☀️' : '🌙';
         html.classList.add('theme-transition');
+        updateSidebarToggle();
       });
     ")
   }
@@ -91,8 +116,12 @@
         color: {light-text};
       }}
 
+      .sidebar-collapsed body {{
+        margin-left: auto;
+      }}
+
       .theme-transition body {{
-        transition: background-color 0.3s, color 0.3s;
+        transition: background-color 0.3s, color 0.3s, margin-left 0.3s;
       }}
 
       /* Dark theme styles */
@@ -101,7 +130,7 @@
         color: {dark-text};
       }}
 
-      .dark-theme aside {{
+      .dark-theme .site-sidebar {{
         background-color: {dark-sidebar};
         border-right-color: {dark-border};
       }}
@@ -146,7 +175,7 @@
       }}
 
       /* Sidebar */
-      aside {{
+      .site-sidebar {{
         position: fixed;
         left: 0;
         top: 0;
@@ -158,16 +187,21 @@
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
+        transition: transform 0.3s ease;
       }}
 
-      aside .sidebar-header {{
+      .sidebar-collapsed .site-sidebar {{
+        transform: translateX(-100%);
+      }}
+
+      .site-sidebar .sidebar-header {{
         text-align: center;
         padding-bottom: 1.5rem;
         margin-bottom: 1.5rem;
         border-bottom: 0.125rem solid {primary};
       }}
 
-      aside .sidebar-header img {{
+      .site-sidebar .sidebar-header img {{
         width: 70%;
         max-width: 100%;
         height: auto;
@@ -188,24 +222,54 @@
         transform: scale(1.2);
       }}
 
-      aside .sidebar-footer {{
+      #sidebar-toggle {{
+        position: fixed;
+        top: 1rem;
+        left: calc(11.25rem + 0.75rem);
+        z-index: 1000;
+        background-color: {light-bg};
+        color: {primary};
+        border: 0.125rem solid {primary};
+        border-radius: 999px;
+        padding: 0.35rem 0.9rem;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+        transition: background-color 0.2s, color 0.2s, transform 0.2s, left 0.3s ease;
+      }}
+
+      #sidebar-toggle:hover {{
+        transform: translateY(-1px);
+      }}
+
+      .dark-theme #sidebar-toggle {{
+        background-color: {dark-sidebar};
+        color: {dark-text};
+        border-color: {dark-border};
+      }}
+
+      .sidebar-collapsed #sidebar-toggle {{
+        left: 1rem;
+      }}
+
+      .site-sidebar .sidebar-footer {{
         margin-top: auto;
         text-align: center;
         padding-top: 2rem;
       }}
 
       /* Remove list markers and default spacing */
-      aside ul {{
+      .site-sidebar ul {{
         list-style: none;
         padding: 0;
         margin: 0;
       }}
 
-      aside li {{
+      .site-sidebar li {{
         margin-bottom: 2rem;
       }}
 
-      aside a {{
+      .site-sidebar a {{
         display: block;
       }}
 
@@ -293,7 +357,18 @@
   }
 }
 
-#let sidebar = html.aside([
+#let sidebar-toggle-button = html.elem("button", attrs: (
+  id: "sidebar-toggle",
+  type: "button",
+  onclick: "toggleSidebar()",
+  aria-label: "Close navigation menu",
+  aria-expanded: "true"
+))[☰];
+
+#let sidebar = html.aside(
+  class: "site-sidebar",
+  aria-label: "Primary navigation",
+)[
   #html.div(class: "sidebar-header")[
     // Note: html.button() doesn't support onclick or id attributes.
     // We use html.elem() with attrs dictionary to add custom HTML attributes.
@@ -323,7 +398,7 @@
       Source
     ]
   ]
-])
+];
 
 // Chapter navigation (previous/next)
 #let chapter-nav(current-file) = context {
@@ -431,6 +506,7 @@
   show math.equation: fix-math
   context {
     if target() == "html" {
+      sidebar-toggle-button
       sidebar
     }
   }
