@@ -1,3 +1,5 @@
+== Value Function Approximation
+
 Recordemos que $v_pi = EE_pi [G_t | S_t =s]$ es la funicon de valor de estado bajo la política $pi$, y la funcion de valor de acción es $q_pi (s, a) = EE_pi [G_t | S_t = s, A_t = a]$, existe un número de estados/acciones y se puede guardar v(s) o q(s,a) en una tabla.
 
 En RL el tamaño de un problema está determinado principalmente por su espacio de estados (y tambien acciones.)
@@ -16,3 +18,17 @@ Necesitamos aprovechar estructura y similitud entre estados, como estados \"pare
 *$v(s,w) approx v_pi(s)$ o $q(s,a,w) approx q_pi (s,a)$*, donde w es un vector de parámetros (pesos). pudiendo ser un vector de pesos de un modelo lineal, todos los pesos de una red neuronal, parámetros de un árbol de desicicon, etc.
 
 En lugar de guardar un número independiente para cada estado, aprendes una fórmula general de parámetros *w* que te da un valor para cualquier estado, ganando así una generalización. *Debemos minimizar el error de la predicción*
+
+== Métodos incrementales.
+*Gradient Descent*
+
+Sea $J(w)$ una funcion diferenciable de el vector de parámetros $w$. Definimos el gradiente como:
+
+$nabla_w J(w) = mat(partial J(w)/(partial_(w_1)); ... ; partial J(w)/partial_(w_n) )$ 
+para encontrar un mínimo local de $J(w)$, ajustamos w en la dirección del gradiente negativo $nabla w  = -1/2 alpha nabla_w J(w)$ donde $alpha$ es el step-size (taza de aprendizaje).
+
+Como queremos minimizar $J(w)$, así que no queremos ir hacia donde crece, si no hacia donde disminuye, usando aproximacón de tylor llegamos a:
+$
+  w_(n u e v o) = w_ (v i e j o) + nabla w = w_(v i e j o) - 1/2 alpha nabla_w J(w_(v i e j o))
+$
+el $-1/2$ es una convención que podriua ser absorbida por $eta : = -1/2 alpha$
