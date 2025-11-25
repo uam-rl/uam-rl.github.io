@@ -32,3 +32,48 @@ $
   w_(n u e v o) = w_ (v i e j o) + nabla w = w_(v i e j o) - 1/2 alpha nabla_w J(w_(v i e j o))
 $
 el $-1/2$ es una convención que podriua ser absorbida por $eta : = -1/2 alpha$
+
+ *Stochastic Gradient Descent*
+
+Definimos la función de costos 
+$
+  J(w) = EE_pi[(V_pi (S) - arrow(v)(S,w))^2 ]
+$
+Donde $arrow(v)(S,w)$ es la aproximación paramétrica con pesos $w$, y $V_pi (S) $ es el valor verdadero del estado S bajo la politica $pi$ (no lo conocemos, pero imaginemos que sí).
+ $=>$ $J(w) = $ error cuadrático medio entre $v_pi $ y $arrow(v)$
+
+ Sea $J(w) = EE_pi [(V_pi (S) - arrow(v)(S,w))^2 ]$ 
+
+ Usamos que la derivada de una esperanza es la esperanza de la derivada:
+
+ $nabla_w J(w) = nabla_w EE_pi [(V_pi (S) - arrow(v)(S,w))^2] = EE_pi [nabla_w (v_pi (S) - arrow(v)(S, w))^2]$
+
+ Para derivar el cuadrado usamos regla de la cadena:
+
+ Sea $e(S,w) := v_pi (S) - arrow(v)(S,w)$ (el error) 
+
+ $=> (v_pi (S) - arrow(v)(S, w))^2 = (e(S,w))^2$ 
+
+ $=> nabla_w (e^2) = 2e nabla_w e$
+
+ Ahora calculamos $nabla_w e: $ $v_pi(S) $ no depende de w $->$ su gradiente es 0
+
+ Como $arrow(v) (S,w) $ si depende de w
+
+ $nabla_w e = nabla_w (v_pi (S) - nabla_w (arrow(v) (S,w))) = 0 -nabla_w arrow(v) (S,w) = - nabla_w arrow(v) (S,w)$
+
+ $=> nabla_w (e^2) = 2e nabla_w e = 2(v_pi (S)-arrow(v) (S,w)) =  -2(v_pi (S) - arrow(v) (S, w)) nabla_w arrow(v) (S,w)$  
+
+ Metemos eso a la esperanza:
+
+ $nabla_w J(w) = EE_pi [nabla_w (v_pi (S) - arrow(v) (S,w))^2] = EE_pi [-2(v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)]$
+
+ sacamos el -2
+
+ $nabla_w J(w) = -2 EE_pi [(v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)]$
+
+ Esto es el gradiente completo.
+
+ $nabla w = -1/2 alpha (-2 EE_pi [(v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)])$
+
+ $nabla w = alpha EE_pi [(v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)]$
