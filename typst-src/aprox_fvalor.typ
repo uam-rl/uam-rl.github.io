@@ -147,7 +147,27 @@ Para TD($lambda$)
 $
   nabla w = alpha (G_t^lambda - arrow(v) (S_t, w))nabla_w arrow(v) (S_t, w)
 $
-Queremos algo intermedioentre TD(0) Y MC, sea $G_t^lambda = (1-lambda)sum_(n=1)^infinity lambda^(n-1) G_t^n$ donde cada $G_t^n$ es un return de n pasos que mira recopensas y luego bootstrtap con $arrow(v)$, por eso decimos que $G_t^lambda$ tambien es sesgado, por que cada $G_t^n$ suele usar $arrow(v)$ al final y ahí entra el sesgo de aproximación
+Queremos algo intermedioentre TD(0) Y MC, sea $G_t^lambda = (1-lambda)sum_(n=1)^infinity lambda^(n-1) G_t^n$ donde cada $G_t^n$ es un return de n pasos que mira recopensas y luego bootstrtap con $arrow(v)$, por eso decimos que $G_t^lambda$ tambien es sesgado, por que cada $G_t^n$ suele usar $arrow(v)$ al final y ahí entra el sesgo de aproximación.
 
+Aquí encontramos un error normal que definimos como $delta_t = R_(t+1) + gamma arrow(v) (S_(t+1), w) - arrow(v)(S_(t), w )$
 
+Si  $delta_t > 0 $ la realidad fue mejor que lo que esperabas $->$ tus valores están demasiado bajos.
+
+Si $delta_t < 0$ la realidad fue pero $->$
+tus valores están demasiado altos.
+
+$E_t = gamma lambda E_(t-1) + x(S_t)$
+
+esto define la traza de elegebilidad $E_t$, que es un vector del mismo tamaño que $w$.
+
+$E_(t-1) $ es la traza en el paso anterior, multiplicas por $gamma lambda$ y esto desvance la Contribución de estados viejos, luego sumamos $x(S_t) $ el estado actual entra con peso 1, digamos que $E_t$ guarda un recuerdo borroso que ha sido visitado recientemente. Cuanto mas reciente un estado, mayor peso tiene su caracteristica en $E_t$ 
+
+$nabla w = alpha delta_t E_t$  es la regla de actualización, tomas el TD- error actual, $delta_t$ lo multiplicas por la traza $E_t$ que reparte el error entre los estados recientes y escalas por $alpha$ y este es el ca,bio de $w$
+ 
+
+\
+\
+\
+
+\
 Note que todos tienen la misma forma $nabla w = alpha ( "target" - "predicción") nabla_w arrow(v)$
