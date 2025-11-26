@@ -77,3 +77,71 @@ Donde $arrow(v)(S,w)$ es la aproximación paramétrica con pesos $w$, y $V_pi (S
  $nabla w = -1/2 alpha (-2 EE_pi [(v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)])$
 
  $nabla w = alpha EE_pi [(v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)]$
+
+ Hasta ahora necesitamos calcular la esperanza, es decir promediar todoso los estados según su probabilidad, eso es caro o imposble de hacer, entonces usamos la idea de *stochastic gradient descent (SGD* en vez de usar la esperanza completa, usamos una muestra.
+
+ *$ nabla w  = alpha (v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)]) ) $*
+
+ Aquí SGD es una aproximación "no sesgada" del gradiente.
+
+ *Feature Vectors*
+
+ Representamos el estado por un vector de características 
+ $x(S) = mat(x_1 (S); dots.v; x_n(S))$
+En vez de trabajar con la representación "cruda", definimos un vector de características $x(S)$, donde cada $x_i (S)$ es una función $x_i : "Estados" -> RR$ del estado que extrae información relevante.
+
+*¿Cómo usamos estas caractiristicas?*
+
+Representamos la función de valor mediante una combinación lineal de características, ese número será la predicción del valor $v_pi (S)$
+
+ $arrow(v) (S, w) = x(S)^T w = sum_(j=1) ^n x_j (S)w_j $ simplemente es un producto punto, cada caracteristica dice algo sobre el estado, el peso $w_i $ indica cuánto aporta esa característica al valor total.
+
+Derivamos
+
+ $nabla_w arrow(v) (S,w) = x(S)$
+
+ Recordemos que $nabla w  = alpha (v_pi (S) - arrow(v) (S,w)) nabla_w arrow(v) (S,w)]) )$
+
+ sustituyendo en el gradiente:
+
+$ nabla w  = alpha (v_pi (S) - arrow(v) (S,w)) x(S))$
+
+$"error" (S) = v_pi (S) - arrow(v) (S,w)$
+
+- Si es positivo, nuestra prediccióin es demasiado baja, queremos subirla, y viceversa.
+- update = tasa × error × entrada.
+
+Supongamos que hay un número finito de estados: $S = {s_1 , ..., s_n}$ Silver define $x^("table)" (S)) = mat(1(S = s_1); dots.v ; 1(S = s_n)) $ donde 1(⋅) es la función indicadora, $1(S = s_i ) = 1 "si el estado es exactamente " s_i, 1(S=s_i) = 0 "en otro caso"$ entonces si S = $s_k$ 
+
+$x^("table)" (S) = (0,...,0,1,0,...0)^T  $
+un vector one-hot, todo 0, exepto 1 en la posición k.
+
+Usando el modelo líneal con estas features  $arrow(v) (S,w) = (x^("table") (S))^T w$, si $S_s_k$ 
+
+$=> arrow(v) (S,w) = w_k  $
+
+*Incremental Prediction Algorithms*
+
+Hasta ahora asumiamos que teníamos $v_pi (S) $ como "etiqueta correcta", en RL no tenemos $v_pi (S)$; solo recompensas, entonces usamos un target (una estimación)
+
+*Targets:*
+
+para Monte Carlo (MC):
+$
+  nabla w = alpha (G_t - arrow(v) (S,w))nabla_w arrow(v) (S_t,w)
+$
+
+El caso de MC solo toma el caso particular Target = $G_t$, y en el caso líneal $nabla_W arrow(v) (S_t, w) = x(S_t)$ así que finalmente 
+
+$nabla w = alpha(G_t - arrow(v) (S_T, w))x(S_t)$
+
+Para TD(0): 
+$
+  nabla w = alpha (R_(t+1) + gamma arrow(v) (S_(t+1), w) - arrow(v) (S_t, w))nabla_w arrow(v) (S_t,w)
+$
+Para TD($lambda$)
+$
+  nabla w = alpha (D_t^lambda - arrow(v) (S_t, w))nabla_w arrow(v) (S_t, w)
+$
+
+Note que todos tienen la misma forma $nabla w = alpha ( "target" - "predicción") nabla_w arrow(v)$
