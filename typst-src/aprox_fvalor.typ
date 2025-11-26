@@ -139,9 +139,15 @@ Para TD(0):
 $
   nabla w = alpha (R_(t+1) + gamma arrow(v) (S_(t+1), w) - arrow(v) (S_t, w))nabla_w arrow(v) (S_t,w)
 $
+
+Para una política fija $pi$, el valor verdadero en el estdado $S_t$ es $v_pi (S_t) = EE_pi [G_t|S_t]$, definimos el target de paso: TD-targe$t_t$ = $R_(t+1) + gamma arrow(v) (S_(t+1), w)$ toma el valor de la recompensa inmediata $R_(t+1)$ mas el valor descontado del siguiente estado segun mi propia aproximación $arrow(v) = (.,w) $ esto viene con error
+
+
 Para TD($lambda$)
 $
-  nabla w = alpha (D_t^lambda - arrow(v) (S_t, w))nabla_w arrow(v) (S_t, w)
+  nabla w = alpha (G_t^lambda - arrow(v) (S_t, w))nabla_w arrow(v) (S_t, w)
 $
+Queremos algo intermedioentre TD(0) Y MC, sea $G_t^lambda = (1-lambda)sum_(n=1)^infinity lambda^(n-1) G_t^n$ donde cada $G_t^n$ es un return de n pasos que mira recopensas y luego bootstrtap con $arrow(v)$, por eso decimos que $G_t^lambda$ tambien es sesgado, por que cada $G_t^n$ suele usar $arrow(v)$ al final y ahí entra el sesgo de aproximación
+
 
 Note que todos tienen la misma forma $nabla w = alpha ( "target" - "predicción") nabla_w arrow(v)$
