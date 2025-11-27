@@ -171,3 +171,57 @@ $nabla w = alpha delta_t E_t$  es la regla de actualización, tomas el TD- error
 
 \
 Note que todos tienen la misma forma $nabla w = alpha ( "target" - "predicción") nabla_w arrow(v)$
+
+
+*Action-Value Function Approximation*
+
+antes habiamos aproximado la función de valor de estadpo $v_pi (s)$, ahora queremos aproximar la función de valor de accion $q_pi (s,a)$, el valor esperado de empezar en s y tomar la acción a, y luego swguir la política $pi$ *$arrow(q) (S,A,w) approx q_pi (S, A)$*.
+
+Esto es analogo a lo que haciamos con $v_pi$, tenemos nuestra función objetivo
+
+$J(w) = EE_pi [(q_pi (S, A) - arrow(q) (S,A, w))^2]$, donde (S,A) son los pares que vemos siguiendo la politica $pi$, y el objetivo es minimizar el error cuadrático medio entre el valor verdadero $q_pi $ y nuestras aproximación $arrow(q ) (S, A, w)$  
+
+Sigueindo con lo mismo derivando usando regla de la cadena
+
+$-1/2 nabla_w J(w) = (q_pi (S,A) - arrow(q) (S,A,w))nabla_w arrow(q) (S,A,w)$
+
+$nabla w = alpha(q_pi (S,A) - arrow(q) (S,A,w))nabla_w arrow(q) (S,A,w)$ 
+
+lo que es update = step-size × (error de predicción) × (gradiente de la predicción)
+
+Nuevamente como no conocemos el valor exacato de $q_pi (S,A)$, lo sustituimos por un target TD o MC.
+
+Analogamente antes teníamos x(S) para estados, ahora queremos aproximar q(S,A) así que las features dependen del par (estado, acción), $x_i (S,A)$ es la i-ésima característica numérica del par (S,A).
+
+Sea $x(S,A) = mat(x_1 (S,A); dots.v; x_n (S,A)) in RR^n$,  donde $x_1 (S,A):$ puede ser ppr ejemplo la posición de un catto si tomas la acción A.
+
+Representamos el action-vlaue por la combinación líneal de las características: *$arrow(q) (S,A,w) = x(S, T)^T w = sum_(j=1)^n x_j (S,A) w_j$* que es exactamente lo mismo que hicimos para $arrow(v) (S,w)$, solo que ahora con (S,A)
+
+El gradiente igual que antes es el vector de features 
+
+$nabla_w arrow(q) (S, A, w) = x(S,A)$
+
+$nabla w = alpha(q_pi (S,A) - arrow(q) (S,A,w))x(S,A)$
+
+Ahora tomamos esa formula y como en predicción la adaptamos a MC, TD, y TD($lambda$), pero para q-funciones.
+
+Para MC $nabla w = alpha(G_t - arrow(q) (S_t, A_t, w)) nabla_w arrow(q) (S_t, A_t, w)$
+
+Para TD(O) $nabla w = alpha(R_(t+1) + gamma arrow(q) (S_(t+1), A_(t+1),
++) - arrow(q) (S_t, A_t, w)) nabla_w arrow(q) (S_t, A_t, w)$
+
+Donde tenemos un error TD: $delta_t = "target"_t - arrow(q) (S_t, A_t, w) "y actualizamos "   nabla w = alpha delta_T x(S_t, A_t)$
+
+Para TD($lambda$) $nabla w = alpha (q_t^lambda - arrow(q) (S_t, A_t, w)) nabla_w arrow(q) (S_t, A_t, w)$
+
+Error TD $delta_t = R_(t+1) + gamma arrow(q) (S_(t+1), A_(t+1), w) - arrow(q) (S_t, A_t, w)$
+
+Traza de elegibilidad
+$E_t = gamma lambda E_(t-1) + nabla_w arrow(q) (S_t, A_t, w)$
+Guarda en memoria borrosa de qué pares (S,A) han sudo visitados recientemente, $gamma lambda$ los va desvaneciendo con el tiempo.
+
+$nabla w = alpha delta_t E_t$
+Con esto hace paso a paso y en línea lo mismo que haría el fowaard view de TD($lambda$) con action-values.
+
+
+ 
