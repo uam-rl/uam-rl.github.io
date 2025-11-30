@@ -1,6 +1,6 @@
 #import "template.typ" as tp
 #show: tp.cool-web-page.with(
-  current-file: "introduccion.typ",
+  current-file: "aprox_fvalor.typ",
 )
 
 == Value Function Approximation
