@@ -35,3 +35,7 @@ Cualquier matriz que se escriba como $A\B$ con $A in RR^(d_"out" times r) "y " B
 Esto se mide con el concepto de rango: básicamente cuánta "complejidad lineal" tiene la matriz. Cuando usas $r$ pequeño, obligas a que la correción $Delta W$ tenga poca complejidad lineal: por eso se llama actualización de rango bajo.
 
 $=>$ la correción $Delta W$ no puede ser cualquier cosa: solo matrices que se puedan escribir como $A B$ con r pequeño. Esto reduce el número de parámetros y "simplifica" la clase de funciones que puedes aprender.
+
+En RL tienes una política $pi_theta (a | s)$, pero dentro $pi_theta$ es un modelo con muchas matrices $W^1, W^2, ... $, cuando haces PPO, GRPO, etc, el algoritmo  te dice cómo cambiar los parámetros para mejorar el reward. 
+
+Con LoRA lo único que cambia es que en lugar de cambiar $W_0$ directamente, dices "mi política tiene matrices $" " W_"eff" = W_0 + A B$, en algunas capas", y el RL solo aprende A y B, osea LoRa es una forma específica de parametrizar la política para que entrenes pocos parámetros (los A, B) en lugar de todo W. 
