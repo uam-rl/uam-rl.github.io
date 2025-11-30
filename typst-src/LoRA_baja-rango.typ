@@ -20,4 +20,18 @@ Supongamos que $W_0 in RR^(d_"out" times d_"in" )  => Delta W "debe tener el mis
 
 LoRA escribe $Delta W  =A B "  con  "  A in RR^(d_"out" times r), " " B in RR^(r times d_"in")$, donde $r$ es un número pequeño.
 
-Supongamos que tenemos una capa de un LLM con $d_"in" = 4096, " " d_"out" = 4096 => W_0 in  RR^(4096 times 4096)$, lo que serían 4096*4096 = 16,777,216 números.
+Supongamos que tenemos una capa de un LLM con $d_"in" = 4096, " " d_"out" = 4096 => W_0 in  RR^(4096 times 4096)$, lo que serían 4096*4096 = 16,777,216 números, si hicieramos fine-tuning normal entrenaríamos muchos millones de parámetros por capa, con LoRA eliges por ejemplo:
+
+ $r = 16 => "  " A in RR^(4096 times 16) " " -> 65536 "parámetros", " " B in RR^(16 times 4096) " " -> "otros " 65,536 $
+
+ Total: $131,072 $ parámetros. Note que es más de 100 veces menor, y puedes seguir haciendo cambios útiles, pero de una forma muy "controlada".
+
+ Con esto tenemos una breve introducción sobre la idea de qué es LoRA.
+
+ == Bajo rango:
+
+Cualquier matriz que se escriba como $A\B$ con $A in RR^(d_"out" times r) "y " B in RR^(r times d_"in")$ no puede ser totalmente "arbitraria", está limitada.
+
+Esto se mide con el concepto de rango: básicamente cuánta "complejidad lineal" tiene la matriz. Cuando usas $r$ pequeño, obligas a que la correción $Delta W$ tenga poca complejidad lineal: por eso se llama actualización de rango bajo.
+
+$=>$ la correción $Delta W$ no puede ser cualquier cosa: solo matrices que se puedan escribir como $A B$ con r pequeño. Esto reduce el número de parámetros y "simplifica" la clase de funciones que puedes aprender.
