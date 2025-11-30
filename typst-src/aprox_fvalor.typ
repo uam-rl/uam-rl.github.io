@@ -1,3 +1,8 @@
+#import "template.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "introduccion.typ",
+)
+
 == Value Function Approximation
 
 Recordemos que $v_pi = EE_pi [G_t | S_t =s]$ es la funicon de valor de estado bajo la política $pi$, y la funcion de valor de acción es $q_pi (s, a) = EE_pi [G_t | S_t = s, A_t = a]$, existe un número de estados/acciones y se puede guardar v(s) o q(s,a) en una tabla.
