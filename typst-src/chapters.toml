@@ -5,3 +5,7 @@ file = "main.typ"
 [[chapters]]
 title = "Introducción"
 file = "introduccion.typ"
+
+[[chapters]]
+title = "aproximación de función de valor"
+file = "aprox_fvalor.typ"
