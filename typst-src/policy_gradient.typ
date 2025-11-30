@@ -1,3 +1,8 @@
+#import "template.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "policy_gradient.typ",
+)
+
 Recordemos que en RL tenemos un agente que toma las desiciones, un entorno con el que este interactua y en cada tiempo t el entorno está en un estado $S_t$ y el agente elige una acción $A_t$, el entorno responde con una recompensa $R_(t+1)$ y un nuevo estado $S_(t+1).$
 
 *Una politica es la forma en que el agente decide qué acción tomar en cada estado:*
