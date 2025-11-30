@@ -1,3 +1,7 @@
+#import "template.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "R1.typ",
+)
 == DeepSeek-R1: incentivar la capacidad de razonamiento en los LLM meidante el aprendizaje por refuerzo.
 
 *Introduction*
