@@ -7,8 +7,12 @@ title = "Introducción"
 file = "introduccion.typ"
 
 [[chapters]]
-title = "aproximación de función de valor"
+title = "Aproximación de función de valor"
 file = "aprox_fvalor.typ"
+
+[[chapters]]
+title = "Métodos de gradiente de políticas"
+file = "policy_gradient.typ"
 
 [[chapters]]
 title = "Notas"
