@@ -1,3 +1,9 @@
+#import "template.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "LoRa_baja-rango.typ",
+)
+
+
 == LoRA como aproximación de baja-rango.
 
 Imaginemos el modelo más simple, entra un vector x y sale un vector y, la regla es: *$y = W\x$*, donde la información de entrada estpa en x, y la forma en que el modelo procesa toda la información está en la matriz W (pesos del modelo). 
@@ -64,4 +70,6 @@ La salida del modelo original sin LoRA $y_0 = W_0 x, "  " y_0 in M_(2 times 1)$,
 
 Entonces, primero se va de dimensión 3 a 1 con B (proyección), depsues de dimension 1 a 2 con A (re-expansión). Eso es lo que significa "bajo rango", toda la corrección vive en un subespacio 1-dimensional en el medio.
 
-La conexión con el RL, supongamos que tenemos un estado $s$, 
+La conexión con el RL, supongamos que tenemos un estado $s$, los pasos para un embedding o algo y obtienes un vector $x(s) in RR^3$, tambien una capa final con pesos $W_"eff" in RR^(2 times 3)$, que produce logits: $z(s) = W_"eff"x (s)$, de eso logits sacas una política sobre dos acciones con softmax:   \  $pi_phi.alt (a = 1| s) = exp(z_1)/ (exp(z_1) + exp(z_2)), "  " pi_phi.alt (a = 2| s) = exp(z_2)/ (exp(z_1) + exp(z_2))$, donde $phi.alt = (A, B) $, son los árámetros LoRA y $W_0$ está fijo.
+
+En RL el algoritmo (PPO, GRPO, ...) te dice cómo actualizar $phi.alt$ para mejorar el retorno, pero la matemática no cambia, sigue haciendo $W_"eff" = W_0 + A B y z = W_"eff" x (s)$, lo único que cambia es de donde viene el gradiente (de la pérdida de RL en vez de una pérdida supervizada.)
