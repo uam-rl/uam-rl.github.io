@@ -3,7 +3,6 @@
   current-file: "LoRa_baja-rango.typ",
 )
 
-
 == LoRA como aproximación de baja-rango.
 
 Imaginemos el modelo más simple, entra un vector x y sale un vector y, la regla es: *$y = W\x$*, donde la información de entrada estpa en x, y la forma en que el modelo procesa toda la información está en la matriz W (pesos del modelo). 
@@ -105,6 +104,30 @@ y los logits pasan a ser:
 
  Cuando uses PPO o GRPO, el algoritmo dirá: ajusta los parámetros para mejorar el retorno $->$ esos parámetros ahora son $phi.alt = (A, B).$
 
+En RL con gradiente dw política, el objeto central es algo como:
 
+$nabla_theta J(theta) = nabla_theta EE_(tau ~pi theta) [G(tau) nabla_theta log p_theta (tau)], "la probabilidad de una trayectoria es:" $
+
+$p_theta (tau) = p(s_0)product_t pi_theta (a_t | s_t) P(s_(t+1) | s_t, a_t)$
+
+ $=> nabla_phi.alt J (phi.alt) = EE [sum_t nabla_phi.alt log pi_phi.alt (a_t | s_t) ("algo tipo ventaja")].$
+
+ Cuando usas LoRA:  $pi_phi.alt$ depende de A,B solo a través de $W_"eff" = W_0 + A B$
+
+ Por la regla de la cadena, el gradiente se descompone :
+    - primero calculas $nabla W_"eff" log pi_phi.alt (a | s)$
+    - y luego lo pasas a A y B
+
+Formalmente, pero sin demostrar:
+
+$
+  nabla_A log pi_phi.alt (a | s) = (nabla W_"eff" log pi_phi.alt (a | s))B^T,
+$
+
+$
+  nabla_B log pi_phi.alt (a | s) = A^T (nabla W_"eff" log pi_phi.alt (a | s))
+$
+
+EL gradiente de la política sigue igual, lo único que cambia es que la política está parametrizada con LoRA, es decir con $W_0 + A B$
  
 
