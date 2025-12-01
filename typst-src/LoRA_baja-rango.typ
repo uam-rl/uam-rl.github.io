@@ -39,3 +39,29 @@ $=>$ la correción $Delta W$ no puede ser cualquier cosa: solo matrices que se p
 En RL tienes una política $pi_theta (a | s)$, pero dentro $pi_theta$ es un modelo con muchas matrices $W^1, W^2, ... $, cuando haces PPO, GRPO, etc, el algoritmo  te dice cómo cambiar los parámetros para mejorar el reward. 
 
 Con LoRA lo único que cambia es que en lugar de cambiar $W_0$ directamente, dices "mi política tiene matrices $" " W_"eff" = W_0 + A B$, en algunas capas", y el RL solo aprende A y B, osea LoRa es una forma específica de parametrizar la política para que entrenes pocos parámetros (los A, B) en lugar de todo W. 
+
+Ejemplo: sea $Delta W = A B$ tamaño 2 x 3.
+
+Y los pesos efectivos: $W_"eff" = W_0 + Delta W$
+
+$=> " " W_0 in RR^(2 times 3)$
+
+$=> " " A in RR^(2 times 1), B in RR^(1 times 3)$
+
+$=> " " Delta W = A B in M_(2 times 3)$ Esta es la correción que LoRA lo agrega $W_0$
+
+$=> " " W_"eff" = W_0 + Delta W $, donde $W_0$ era lo que el modelo sabía, LoRA aprendió A, B, que generan $Delta W$, y la capa que realmente se usa en inferencia es $W_"eff"$
+
+Tomemos un vector de entrada $x in M_(3 times 1)$
+
+La salida del modelo original sin LoRA $y_0 = W_0 x, "  " y_0 in M_(2 times 1)$, con LoRApodemos verlo:
+
+1. Usando directamente $W_"eff"$ $" " =>  y_"eff" = W_"eff" x, => " " y_"eff" in M_(2 times 1)$
+
+2. Separando modelo base + correción LoRA, usando la identidad: $y"eff" = W_0 x + Delta W x$, donde $y_"eff" in M_(2 times 3)$, que es exactamente lo que se obtuvo en 1.
+
+3. La factorización real de LoRA, $Delta W x = A(B x)$, recuerda que $B in M_(1 times 3) " " => B x in M_(1 times 1) "  " A (B x) in M_(2 times 1)$, que es exactamente $Delta W x.$ 
+
+Entonces, primero se va de dimensión 3 a 1 con B (proyección), depsues de dimension 1 a 2 con A (re-expansión). Eso es lo que significa "bajo rango", toda la corrección vive en un subespacio 1-dimensional en el medio.
+
+La conexión con el RL, supongamos que tenemos un estado $s$, 
