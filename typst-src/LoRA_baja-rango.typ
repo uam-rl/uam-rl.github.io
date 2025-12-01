@@ -73,3 +73,38 @@ Entonces, primero se va de dimensión 3 a 1 con B (proyección), depsues de dime
 La conexión con el RL, supongamos que tenemos un estado $s$, los pasos para un embedding o algo y obtienes un vector $x(s) in RR^3$, tambien una capa final con pesos $W_"eff" in RR^(2 times 3)$, que produce logits: $z(s) = W_"eff"x (s)$, de eso logits sacas una política sobre dos acciones con softmax:   \  $pi_phi.alt (a = 1| s) = exp(z_1)/ (exp(z_1) + exp(z_2)), "  " pi_phi.alt (a = 2| s) = exp(z_2)/ (exp(z_1) + exp(z_2))$, donde $phi.alt = (A, B) $, son los árámetros LoRA y $W_0$ está fijo.
 
 En RL el algoritmo (PPO, GRPO, ...) te dice cómo actualizar $phi.alt$ para mejorar el retorno, pero la matemática no cambia, sigue haciendo $W_"eff" = W_0 + A B y z = W_"eff" x (s)$, lo único que cambia es de donde viene el gradiente (de la pérdida de RL en vez de una pérdida supervizada.)
+
+== LoRA dentro de una política miníma
+
+Supongamos que cada estado $s$ lol convertimos en un vector de características: $x(s) in RR^(d_"in")$, esto puede venir de un embedding, de una MLP, de un transformer, lo que sea, no importa cómo, solo asumimos que para cada estado tengo un vector $x(s)$.
+
+Tomemos una capa lineal con pesos efectivos $W_"eff" in RR^(|A| times d_"in")$, donde |A| es el número de acciones, definimos las logits como $z(s) = W_"eff" x(s) in RR^(|A|),$  la política estocástica es: 
+
+$pi_phi.alt (a| s) = exp(z_a (s))/(sum_a' exp(z_a' (s)))$, donde $z_a (s)$ es la coordenada de $z(s)$ correspondiente a la acción a, $phi.alt$ son los parámetros que vamos a entrenar (ahorita van a ser A,B), hasta ahora esto e suna política softmax totalmente estándar de RL.
+
+Ahora metemos LoRA en esa matriz de logits:
+
+$W_0 "serán los pesos pre-entrenados (congelados)"$
+
+$Delta W = A B  "será la correcón LoRA"$
+
+$=> "  " W_"eff" = W_0 + A B, "  con " A in RR^(|A| times r), " " B in RR^(r times d_"inn")$
+
+\
+y los logits pasan a ser:
+
+ $z(s) = W_"eff" x(s) = W_o x(s) + A(B x(s))$
+
+ $W_0 x(s)$: es el comportamiento base del modelo (la política original).
+
+ $A(B x(s))$: ajuste que estás aprendiendo con RL pero de bajo rango. 
+
+ La política ya depende sólo de $phi.alt = (A, B)$, porque $W_0$ está fijado:
+
+ $pi_phi.alt (a | s ) = "Softmax"(W_0 x(s) + A(B x (s)))_a $
+
+ Cuando uses PPO o GRPO, el algoritmo dirá: ajusta los parámetros para mejorar el retorno $->$ esos parámetros ahora son $phi.alt = (A, B).$
+
+
+ 
+
