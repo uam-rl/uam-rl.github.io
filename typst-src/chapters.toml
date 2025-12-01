@@ -15,5 +15,9 @@ title = "Métodos de gradiente de políticas"
 file = "policy_gradient.typ"
 
 [[chapters]]
+title = "LoRA como aproximación de baja-rango"
+file = "LoRA_baja-rango.typ"
+
+[[chapters]]
 title = "Notas"
 file = "R1.typ"
