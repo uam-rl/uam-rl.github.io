@@ -18,4 +18,8 @@ La idea central sería:
 - Tienes una política vieja $pi_(theta_"old")$ con la que recoges datos.
 - Quieres actualizar a $pi_theta$ pero sin deformarla demasiado.
 
-Con esto, definimos el ratio: $r_t (theta) = (pi_theta (a_t | s_t))/(pi_(theta_"old") (a_t | s_t))$
+Con esto, definimos el ratio: $r_t (theta) = (pi_theta (a_t | s_t))/(pi_(theta_"old") (a_t | s_t))$.
+
+El objetivo PPO es algo como esto:
+
+$L^"CLIP" (theta) = EE_t ["min"(t_t (theta) A_t, "clip"(r_t(theta), 1 - epsilon, 1 + epsilon)arrow(A)_t)]$
