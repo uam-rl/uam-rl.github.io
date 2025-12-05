@@ -1,3 +1,7 @@
+#import "template.typ" as tp
+#show: tp.cool-web-page.with(
+  current-file: "aprox_fvalor.typ",
+)
 
 == Value Function Approximation
 
@@ -222,7 +226,7 @@ $E_t = gamma lambda E_(t-1) + nabla_w arrow(q) (S_t, A_t, w)$
 Guarda en memoria borrosa de qué pares (S,A) han sudo visitados recientemente, $gamma lambda$ los va desvaneciendo con el tiempo.
 
 $nabla w = alpha delta_t E_t$
-Con esto hace paso a paso y en línea lo mismo que haría el fowaard view de TD($lambda$) con action-values..
+Con esto hace paso a paso y en línea lo mismo que haría el fowaard view de TD($lambda$) con action-values.
 
 
  
